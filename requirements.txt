@@ -1,0 +1,9 @@
+fastapi>=0.110
+uvicorn>=0.29
+sqlalchemy>=2.0
+python-multipart>=0.0.9
+PyJWT>=2.7
+# Only needed if STORAGE_BACKEND=s3
+boto3>=1.34
+# PostgreSQL driver (only if DATABASE_URL points to Postgres)
+psycopg2-binary>=2.9

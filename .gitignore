@@ -1,0 +1,7 @@
+.env
+*.db
+evidence_store/
+__pycache__/
+.pytest_cache/
+venv/
+node_modules/

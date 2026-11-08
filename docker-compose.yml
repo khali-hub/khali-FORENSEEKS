@@ -1,0 +1,41 @@
+# Runs the app and its PostgreSQL database together.
+# Needs a file called .env next to this one (see DEPLOY guide).
+services:
+  db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: forensics
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: forensics
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U forensics -d forensics"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  app:
+    build: .
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: postgresql+psycopg2://forensics:${DB_PASSWORD}@db:5432/forensics
+      SECRET_KEY: ${SECRET_KEY}
+      ADMIN_USERNAME: ${ADMIN_USERNAME:-admin}
+      ADMIN_PASSWORD: ${ADMIN_PASSWORD}
+      EVIDENCE_DIR: /data/evidence
+      STORAGE_BACKEND: ${STORAGE_BACKEND:-local}
+      S3_BUCKET: ${S3_BUCKET:-}
+      S3_REGION: ${S3_REGION:-}
+    volumes:
+      - evidence:/data/evidence
+    ports:
+      - "80:8000"
+
+volumes:
+  pgdata:
+  evidence:
